@@ -1,0 +1,1 @@
+web: gunicorn deadman.wsgi --log-file -
