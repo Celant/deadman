@@ -10,5 +10,5 @@ class DeadmanSwitch(models.Model):
     contact = models.ForeignKey(ContactNumber, on_delete=models.CASCADE)
     interval = models.IntegerField(default=30)
     last_alive = models.DateTimeField()
-    disabled = models.BooleanField(default=false)
+    disabled = models.BooleanField(default=False)
 # Create your models here.
