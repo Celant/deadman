@@ -1,0 +1,15 @@
+<h1>{{ switch.name }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'deadmanapp:update' switch.id %}" method="post">
+{% csrf_token %}
+    <input type="text" name="name" id="name" value="{{ switch.name }}" />
+    <input type="text" name="interval" id="interval" value="{{ switch.interval }}" />
+    {% if switch.disabled %}
+    <input type="checkbox" name="disabled" id="disabled" checked />
+    {% else %}
+    <input type="checkbox" name="disabled" id="disabled" />
+    {% endif %}
+    <input type="submit" value="Submit" />
+</form>

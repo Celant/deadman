@@ -1,0 +1,9 @@
+{% if switch_list %}
+    <ul>
+    {% for switch in switch_list %}
+        <li><a href="{% url 'deadmanapp:detail' switch.id %}">{{ switch.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Deadman Switches are available.</p>
+{% endif %}
