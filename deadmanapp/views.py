@@ -18,8 +18,8 @@ def answer(request, switch_id):
 
 def update(request, switch_id):
     switch = get_object_or_404(DeadmanSwitch, pk=switch_id)
-    switch.name = request.POST['name']
-    switch.interval = request.POST['interval']
+    switch.name = request.POST.get('name', "Default Switch")
+    switch.interval = request.POST.get('interval', 30)
     if 'disabled' in request.POST:
         switch.disabled = True
     else:
