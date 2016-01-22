@@ -3,16 +3,15 @@ from __future__ import unicode_literals
 from django.db import models
 from django.forms import ModelForm
 
-class ContactType(models.Model):
-    name = models.CharField(max_length=50, default="New ContactType")
-
-    def __str__(self):
-        return self.name
+CONTACT_TYPES = (
+    ('PHONE', 'Phone Number'),
+    ('EMAIL', 'Email Address'),
+)
 
 class Contact(models.Model):
     contact_name = models.CharField(max_length=50)
     contact_info = models.CharField(max_length=50)
-    contact_type = models.ForeignKey(ContactType, on_delete=models.PROTECT, null=True)
+    contact_type = models.CharField(max_length=50, choices=CONTACT_TYPES)
 
     def __str__(self):
         return self.contact_name
@@ -35,4 +34,4 @@ class DeadmanSwitchForm(ModelForm):
 class ContactForm(ModelForm):
     class Meta:
         model = Contact
-        fields = []
+        fields = ['contact_name', 'contact_info', 'contact_type']
