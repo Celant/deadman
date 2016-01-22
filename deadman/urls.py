@@ -8,4 +8,5 @@ urlpatterns = [
 
     url(r'^app/', include('deadmanapp.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^$', include('deadmanapp.urls')),
 ]
