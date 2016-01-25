@@ -28,7 +28,7 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = (
-    'deadmanapp.apps.DeadmanappConfig',
+    'deadmanapp',
     'bootstrapform',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -119,3 +119,9 @@ STATICFILES_DIRS = (
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 LOGIN_URL = '/app/login/'
+
+# CELERY SETTINGS
+BROKER_URL = os.environ['REDIS_URL']
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

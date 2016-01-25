@@ -4,22 +4,20 @@ from django.core.urlresolvers import reverse
 from django.template import loader, RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from deadmanapp.forms import DeadmanSwitchForm, LoginForm, PasswordChangeForm
 
-from .models import DeadmanSwitch
+from deadmanapp.forms import DeadmanSwitchForm, LoginForm, PasswordChangeForm
+from deadmanapp.decorators import password_expired
+from deadmanapp.models import DeadmanSwitch
 
 @login_required
+@password_expired
 def index(request):
-    if request.user.userdetails.password_expired == True:
-        return redirect(reverse('deadmanapp:password-change')
     switch_list = DeadmanSwitch.objects.order_by('id')
     return render(request, 'deadmanapp/index.html', {'switch_list': switch_list})
 
 @login_required
+@password_expired
 def switch_detail(request, switch_id):
-    if request.user.userdetails.password_expired == True:
-        return redirect(reverse('deadmanapp:password-change')
-
     switch = get_object_or_404(DeadmanSwitch, pk=switch_id)
     data = {'name' : switch.name, 'interval' : switch.interval, 'contact' : switch.contact, 'disabled' : switch.disabled}
     form = DeadmanSwitchForm(initial=data)
@@ -41,7 +39,7 @@ def update(request, switch_id):
         switch.disabled = False
     switch.save()
 
-    return HttpResponseRedirect(reverse('deadmanapp:index'))
+    return redirect(reverse('deadmanapp:home'))
 
 def answer(request, switch_id):
     return HttpResponse("You're responding to switch {0}.".format(switch_id))
@@ -67,14 +65,14 @@ def user_login(request):
         if user:
             # Is the account active? It could have been disabled.
             if user.is_active:
-
-                if request.user.userdetails.password_expired == True:
-                    return redirect(reverse('deadmanapp:password-change')
+                if user.userdetails.password_expired == True:
+                    login(request, user)
+                    return redirect(reverse('deadmanapp:password-change'))
                 else:
                     # If the account is valid and active, we can log the user in.
                     # We'll send the user back to the homepage.
                     login(request, user)
-                    return HttpResponseRedirect('/app/')
+                    return redirect(reverse('deadmanapp:home'))
             else:
                 # An inactive account was used - no logging in!
                 return redirect(reverse('deadmanapp:login') + '?disabled=true')
@@ -129,13 +127,12 @@ def user_password_change(request):
         password_confirmation = request.POST['password_confirmation']
 
         if new_password == password_confirmation:
-            # stuff
             request.user.set_password(new_password)
             request.user.userdetails.password_expired = False
+            request.user.userdetails.save()
             request.user.save()
             return redirect(reverse('deadmanapp:home'))
         else:
-            # more stuff
             return redirect(reverse('deadmanapp:password-change') + '?nomatch=true')
 
     # The request is not a HTTP POST, so display the login form.

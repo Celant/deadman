@@ -29,7 +29,7 @@ class DeadmanSwitch(models.Model):
 
 class UserDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    password_expired = models.BooleanField(verbose_name="Must change password on next login", default=False)
+    password_expired = models.BooleanField(verbose_name="Password expired", default=False)
 
 class DeadmanSwitchForm(ModelForm):
     class Meta:
