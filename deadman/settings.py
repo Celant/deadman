@@ -30,6 +30,7 @@ DEBUG = True
 INSTALLED_APPS = (
     'deadmanapp',
     'bootstrapform',
+    'annoying',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

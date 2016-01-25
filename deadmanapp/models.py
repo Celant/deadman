@@ -4,6 +4,8 @@ from django.db import models
 from django.forms import ModelForm
 from django.contrib.auth.models import User
 
+from annoying.fields import AutoOneToOneField
+
 CONTACT_TYPES = (
     ('PHONE', 'Phone Number'),
     ('EMAIL', 'Email Address'),
@@ -28,7 +30,7 @@ class DeadmanSwitch(models.Model):
         return self.name
 
 class UserDetails(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = AutoOneToOneField(User, on_delete=models.CASCADE)
     password_expired = models.BooleanField(verbose_name="Password expired", default=False)
 
 class DeadmanSwitchForm(ModelForm):
