@@ -15,3 +15,7 @@ class ContactForm(forms.Form):
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
     password = forms.CharField(widget=forms.PasswordInput)
+
+class PasswordChangeForm(forms.Form):
+    new_password = forms.CharField(widget=forms.PasswordInput)
+    password_confirmation = forms.CharField(widget=forms.PasswordInput)

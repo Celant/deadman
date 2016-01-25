@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.forms import ModelForm
+from django.contrib.auth.models import User
 
 CONTACT_TYPES = (
     ('PHONE', 'Phone Number'),
@@ -25,6 +26,10 @@ class DeadmanSwitch(models.Model):
 
     def __str__(self):
         return self.name
+
+class UserDetails(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    password_expired = models.BooleanField(verbose_name="Must change password on next login", default=False)
 
 class DeadmanSwitchForm(ModelForm):
     class Meta:

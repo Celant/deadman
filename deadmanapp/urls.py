@@ -11,4 +11,6 @@ urlpatterns = [
     url(r'^contacts/$', views.contacts, name='contacts'),
     url(r'^login/$', views.user_login, name='login'),
     url(r'^logout/$', views.user_logout, name='logout'),
+    url(r'^account/$', views.user_account, name='account'),
+    url(r'^account/password$', views.user_password_change, name='password-change'),
 ]

@@ -4,17 +4,22 @@ from django.core.urlresolvers import reverse
 from django.template import loader, RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from deadmanapp.forms import DeadmanSwitchForm, LoginForm
+from deadmanapp.forms import DeadmanSwitchForm, LoginForm, PasswordChangeForm
 
 from .models import DeadmanSwitch
 
 @login_required
 def index(request):
+    if request.user.userdetails.password_expired == True:
+        return redirect(reverse('deadmanapp:password-change')
     switch_list = DeadmanSwitch.objects.order_by('id')
     return render(request, 'deadmanapp/index.html', {'switch_list': switch_list})
 
 @login_required
 def switch_detail(request, switch_id):
+    if request.user.userdetails.password_expired == True:
+        return redirect(reverse('deadmanapp:password-change')
+
     switch = get_object_or_404(DeadmanSwitch, pk=switch_id)
     data = {'name' : switch.name, 'interval' : switch.interval, 'contact' : switch.contact, 'disabled' : switch.disabled}
     form = DeadmanSwitchForm(initial=data)
@@ -62,10 +67,14 @@ def user_login(request):
         if user:
             # Is the account active? It could have been disabled.
             if user.is_active:
-                # If the account is valid and active, we can log the user in.
-                # We'll send the user back to the homepage.
-                login(request, user)
-                return HttpResponseRedirect('/app/')
+
+                if request.user.userdetails.password_expired == True:
+                    return redirect(reverse('deadmanapp:password-change')
+                else:
+                    # If the account is valid and active, we can log the user in.
+                    # We'll send the user back to the homepage.
+                    login(request, user)
+                    return HttpResponseRedirect('/app/')
             else:
                 # An inactive account was used - no logging in!
                 return redirect(reverse('deadmanapp:login') + '?disabled=true')
@@ -99,3 +108,49 @@ def user_logout(request):
     logout(request)
 
     return redirect(reverse('deadmanapp:login') + '?logout=true')
+
+@login_required
+def user_account(request):
+
+    logout(request)
+
+    return redirect(reverse('deadmanapp:login') + '?logout=true')
+
+@login_required
+def user_password_change(request):
+    # Like before, obtain the context for the user's request.
+    context = RequestContext(request)
+
+    # If the request is a HTTP POST, try to pull out the relevant information.
+    if request.method == 'POST':
+        # Gather the username and password provided by the user.
+        # This information is obtained from the login form.
+        new_password = request.POST['new_password']
+        password_confirmation = request.POST['password_confirmation']
+
+        if new_password == password_confirmation:
+            # stuff
+            request.user.set_password(new_password)
+            request.user.userdetails.password_expired = False
+            request.user.save()
+            return redirect(reverse('deadmanapp:home'))
+        else:
+            # more stuff
+            return redirect(reverse('deadmanapp:password-change') + '?nomatch=true')
+
+    # The request is not a HTTP POST, so display the login form.
+    # This scenario would most likely be a HTTP GET.
+    else:
+        # No context variables to pass to the template system, hence the
+        # blank dictionary object...
+        form = PasswordChangeForm()
+        print 'pretest'
+        if 'nomatch' in request.GET:
+            error_message = 'Your passwords do not match.'
+            return render(request, 'deadmanapp/password_change.html', {'form': form, 'error_message': error_message})
+
+        if request.user.userdetails.password_expired == True:
+            warning_message = 'Your password has expired and must be changed'
+            return render(request, 'deadmanapp/password_change.html', {'form': form, 'warning_message': warning_message})
+
+        return render(request, 'deadmanapp/password_change.html', {'form': form})
